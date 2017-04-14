@@ -1,0 +1,39 @@
+{
+  "name": "js30-bot",
+  "version": "1.0.0",
+  "description": "Slack bot for our #JavaScript30 group",
+  "license": "MIT",
+  "private": true,
+  "repository": "jgierer12/js30-bot",
+  "author": {
+    "name": "Jonas Gierer",
+    "email": "jgierer12@outlook.com",
+    "url": "jgierer12.com"
+  },
+  "scripts": {
+    "test": "jest",
+    "start": "node lib/index.js",
+    "build": "babel src -d lib"
+  },
+  "files": [
+    "index.js",
+    "lib/"
+  ],
+  "babel": {
+    "presets": [
+      "env"
+    ]
+  },
+  "dependencies": {
+    "@slack/client": "^3.9.0",
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.3.3",
+    "moment": "^2.18.1",
+    "node-schedule": "^1.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-xo": "^0.18.1",
+    "jest": "^19.0.2"
+  }
+}
