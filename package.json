@@ -19,8 +19,7 @@
     "postinstall": "npm run build"
   },
   "files": [
-    "index.js",
-    "lib/"
+    "lib"
   ],
   "babel": {
     "presets": [
