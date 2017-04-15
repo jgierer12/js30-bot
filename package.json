@@ -11,7 +11,9 @@
     "url": "jgierer12.com"
   },
   "scripts": {
-    "test": "jest",
+    "lint": "eslint src",
+    "unit": "jest src",
+    "test": "npm run lint && npm run unit",
     "start": "node lib/index.js",
     "build": "babel src -d lib",
     "postinstall": "npm run build"
@@ -24,6 +26,14 @@
     "presets": [
       "env"
     ]
+  },
+  "eslintConfig": {
+    "extends": [
+      "xo"
+    ],
+    "env": {
+      "node": true
+    }
   },
   "dependencies": {
     "@slack/client": "^3.9.0",
