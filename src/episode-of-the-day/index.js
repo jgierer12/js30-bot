@@ -10,7 +10,7 @@ import config from './config';
 
 let channels;
 
-const episodeOfTheDay = (date) => {
+const episodeOfTheDay = date => {
 	const episodeNumber = date.diff(config.startDate, 'days') + 1;
 
 	if (episodeNumber > episodes.length) {
@@ -20,9 +20,9 @@ const episodeOfTheDay = (date) => {
 	return episodes[episodeNumber - 1];
 };
 
-const channelID = (originalChannel) => {
+const channelID = originalChannel => {
 	if (originalChannel.charAt(0) === '#' || originalChannel.charAt(0) === '@') {
-		return channels.filter((channel) => {
+		return channels.filter(channel => {
 			return channel.name === originalChannel.substring(1);
 		})[0].id;
 	}
@@ -55,10 +55,10 @@ There are lots of other cool resources for learning JavaScript. Try ${resource}!
 			);
 		}, 250);
 	}
-}
+};
 
 export default () => {
-	rtm.on(slack.CLIENT_EVENTS.RTM.AUTHENTICATED, (rtmStartData) => {
+	rtm.on(slack.CLIENT_EVENTS.RTM.AUTHENTICATED, rtmStartData => {
 		channels = rtmStartData.channels;
 
 		schedule.scheduleJob({hour: 12, minute: 0, seconds: 1}, () => {
@@ -66,8 +66,10 @@ export default () => {
 		});
 	});
 
-	rtm.on(slack.RTM_EVENTS.MESSAGE, (message) => {
-		if (!message.text) return;
+	rtm.on(slack.RTM_EVENTS.MESSAGE, message => {
+		if (!message.text) {
+			return;
+		}
 
 		if (
 			message.text.includes(`<@${rtm.activeUserId}>`) &&
@@ -80,4 +82,4 @@ export default () => {
 			announceMessage(message.channel);
 		}
 	});
-}
+};
