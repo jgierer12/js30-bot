@@ -72,7 +72,11 @@ export default () => {
 		}
 
 		if (
-			message.text.includes(`<@${rtm.activeUserId}>`) &&
+			message.user !== rtm.activeUserId &&
+			(
+				message.text.includes(`<@${rtm.activeUserId}>`) ||
+				message.channel.charAt(0) === 'D'
+			) &&
 			(
 				message.text.toLowerCase().includes(`episode of the day`) ||
 				message.text.toLowerCase().includes(`today's episode`) ||
