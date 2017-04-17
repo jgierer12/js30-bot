@@ -37,8 +37,8 @@ const announceMessage = (channel = config.defaultChannel, force = false, date = 
 		setTimeout(() => {
 			rtm.sendMessage(`
 Today's episode is *${episode.title}*!
-:tv: Stream: ${encodeURI(episode.streamURL)}
-:rocket: Code: ${encodeURI(episode.sourceURL)}
+:tv: Stream: ${episode.streamURL}
+:rocket: Code: ${episode.sourceURL}
 				`,
 				channelID(channel)
 			);
