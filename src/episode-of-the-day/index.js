@@ -61,7 +61,7 @@ export default () => {
 	rtm.on(slack.CLIENT_EVENTS.RTM.AUTHENTICATED, rtmStartData => {
 		channels = rtmStartData.channels;
 
-		schedule.scheduleJob({hour: 12, minute: 0, seconds: 1}, () => {
+		schedule.scheduleJob(config.schedule, () => {
 			announceMessage();
 		});
 	});
