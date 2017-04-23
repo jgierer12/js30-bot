@@ -29,7 +29,15 @@ const getCurrentEpisodeIndex = callback => {
 			console.log(err);
 		}
 
-		return callback((reply || 0) - 1);
+		let episodeNumber = 1;
+
+		if (reply) {
+			episodeNumber = reply;
+		} else {
+			db.set('currentEpisode', episodeNumber);
+		}
+
+		return callback(episodeNumber - 1);
 	});
 };
 
