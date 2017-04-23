@@ -1,24 +1,17 @@
 import slack from '@slack/client';
-import moment from 'moment';
 import schedule from 'node-schedule';
 
 import rtm from '../rtm';
+
+import db from '../db';
+
+import {mentionsUser, isIM} from '../message-utils';
 
 import episodes from './episodes';
 import otherResources from './other-resources';
 import config from './config';
 
 let channels;
-
-const episodeOfTheDay = date => {
-	const episodeNumber = date.diff(config.startDate, 'days') + 1;
-
-	if (episodeNumber > episodes.length) {
-		return null;
-	}
-
-	return episodes[episodeNumber - 1];
-};
 
 const channelID = originalChannel => {
 	if (originalChannel.charAt(0) === '#' || originalChannel.charAt(0) === '@') {
@@ -30,31 +23,57 @@ const channelID = originalChannel => {
 	return originalChannel;
 };
 
-const announceMessage = (channel = config.defaultChannel, force = false, date = moment()) => {
-	const episode = episodeOfTheDay(date);
+const getCurrentEpisodeIndex = callback => {
+	db.get('currentEpisode', (err, reply) => {
+		if (err) {
+			console.log(err);
+		}
 
-	if (episode) {
+		return callback((reply || 0) - 1);
+	});
+};
+
+const nextEpisode = callback => {
+	db.incr('currentEpisode', callback);
+};
+
+const announceEpisode = (episodeIndex, options = {}) => {
+	options = Object.assign(
+		{
+			channel: config.defaultChannel,
+			force: false
+		},
+		options
+	);
+
+	if (episodeIndex < episodes.length) {
+		const episode = episodes[episodeIndex];
+
 		setTimeout(() => {
-			rtm.sendMessage(`
-Today's episode is *${episode.title}*!
+			rtm.sendMessage(
+`Today's episode is *${episode.title}*!
 :tv: Stream: ${episode.streamURL}
-:rocket: Code: ${episode.sourceURL}
-				`,
-				channelID(channel)
+:rocket: Code: ${episode.sourceURL}`,
+				channelID(options.channel)
 			);
 		}, 250);
-	} else if (force) {
+	} else if (options.force) {
 		const resource = otherResources[0];
 
 		setTimeout(() => {
-			rtm.sendMessage(`
-We've completed the #JavaScript30 course :tada:
-There are lots of other cool resources for learning JavaScript. Try ${resource}!
-				`,
-				channelID(channel)
+			rtm.sendMessage(
+`We've completed the #JavaScript30 course :tada:
+There are lots of other cool resources for learning JavaScript. Try ${resource}!`,
+				channelID(options.channel)
 			);
 		}, 250);
 	}
+};
+
+const announceCurrentEpisode = (options = {}) => {
+	getCurrentEpisodeIndex(episodeIndex => {
+		announceEpisode(episodeIndex, options);
+	});
 };
 
 export default () => {
@@ -62,7 +81,7 @@ export default () => {
 		channels = rtmStartData.channels;
 
 		schedule.scheduleJob(config.schedule, () => {
-			announceMessage();
+			nextEpisode(announceCurrentEpisode);
 		});
 	});
 
@@ -80,7 +99,7 @@ export default () => {
 				/(today'?s|current) (episode|ep\.?)/i
 			)
 		) {
-			announceMessage(message.channel);
+			announceCurrentEpisode({channel: message.channel, force: true});
 		}
 	});
 };
