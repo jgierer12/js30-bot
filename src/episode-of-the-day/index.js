@@ -67,20 +67,17 @@ export default () => {
 	});
 
 	rtm.on(slack.RTM_EVENTS.MESSAGE, message => {
-		if (!message.text) {
+		if (!message.text || message.user === rtm.activeUserId) {
 			return;
 		}
 
 		if (
-			message.user !== rtm.activeUserId &&
 			(
-				message.text.includes(`<@${rtm.activeUserId}>`) ||
-				message.channel.charAt(0) === 'D'
+				mentionsUser(message, rtm.activeUserId) ||
+				isIM(message)
 			) &&
-			(
-				message.text.toLowerCase().includes(`episode of the day`) ||
-				message.text.toLowerCase().includes(`today's episode`) ||
-				message.text.toLowerCase().includes(`current episode`)
+			message.text.match(
+				/(today'?s|current) (episode|ep\.?)/i
 			)
 		) {
 			announceMessage(message.channel);
